@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #4a69bd;
+            margin-bottom: 25px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #e55039;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s ease;
+        }
+        .back-link:hover {
+            color: #c0392b;
+        }
+        .error-message {
+            color: white;
+            background-color: #e55039;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+        .score-box {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #1abc9c;
+            border: 5px solid #1abc9c;
+            border-radius: 50%;
+            width: 160px;
+            height: 160px;
+            line-height: 150px;
+            margin: 25px auto;
+        }
+        .recommendation-list {
+            text-align: left;
+            margin-top: 30px;
+            list-style: none;
+            padding: 0;
+        }
+        .recommendation-item {
+            background-color: #fafafa;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s ease;
+        }
+        .recommendation-item:hover {
+            background-color: #f0f4ff;
+        }
+        .rec-details {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+        .rec-score {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4a69bd;
+            text-align: right;
+            min-width: 90px;
+        }
+        .rec-meta {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .rec-image {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if error %}
+            <h1>Processing Failed ❌</h1>
+            <div class="error-message">{{ error }}</div>
+        {% else %}
+            {% if mode == 'Compatibility' %}
+                <h1>Compatibility Result 🎯</h1>
+                {% if score is not none %}
+                    <p>The compatibility score between the two items is:</p>
+                    <div class="score-box">{{ score }}%</div>
+                    <h2 style="color:#555;">Higher score = better outfit match!</h2>
+                {% endif %}
+            {% elif mode == 'Recommendation' %}
+                <h1>Top Outfit Recommendations 💡</h1>
+                <p>Based on your <strong>{{ item_gender }}</strong> <strong>{{ item_category }}</strong>, here are your best matches:</p>
+
+                {% if recommendations %}
+                    <ul class="recommendation-list">
+                        {% for rec in recommendations %}
+                        <li class="recommendation-item">
+                            <img src="{{ url_for('static', filename='images/img416.jpg') }}" 
+                            <!-- <img src="{{ url_for('static', filename=rec.image_path) }}"  -->
+                                 alt="{{ rec.category }} recommended item" 
+                                 class="rec-image">
+                            <div class="rec-details">
+                                <strong>{{ rec.category }}</strong>
+                                <div class="rec-meta">
+                                    Gender: {{ rec.gender }} | Product ID: {{ rec.product_id }}
+                                </div>
+                            </div>
+                            <div class="rec-score">{{ rec.score }}%</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <p style="margin-top: 20px; color: #666;">
+                        Note: These scores are predictions based on visual and categorical features.
+                    </p>
+                {% else %}
+                    <p style="font-size: 1.2em; color: #e55039;">
+                        No compatible items found for the selected category and gender.
+                    </p>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+        <a href="/" class="back-link">← Back to Upload Form</a>
+    </div>
+</body>
+</html>

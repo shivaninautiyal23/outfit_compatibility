@@ -1,23 +1,30 @@
 # outfit_compatibility
 
-My project **Outfit Compatibility Checker** uses deep learning to understand clothing images and suggest if outfit is compatibile and also gives visually similar items to users. It analyzes product features using siamese network and generates embeddings that help match styles, colours, and pattern more accurately.
+My project **Outfit Compatibility Checker** uses deep learning to understand clothing images and suggest if outfit is compatibile and also gives visually similar items to users. It analyzes product features using ResNet and MobileNet trained model and generates embeddings that help match styles, colours, and pattern more accurately.
 
 # Industry revelance 
 It can be used in E-commerce to boost sales, personalize the shopping experience.
 It can be scaled to handle millions of products, power virtual try-ons and even integrate into AR/VR shopping apps.
 
 # Tech Stack Used 
-1. **Keras** -
-
-
+1. Keras
+2. Tensorflow
+3. ResNet
+4. MobileNet
+5. Sklearn
+6. numpy
+7. pandas
+   
 # About all the files 
 1. **Dataset** -
    a. fashion_products_sample.csv - file containing custom dataset (obviously made by me and my team) having all the information about the clothes and accessories (like product_id, product_name, category, brand, gender, image_path, occassions,class, colour, description)
    b. pairing.csv - having two images img_a and img_b with label having value 0/1 where 0 means these two images are not compatible and 1 means the opposite.
 
-2. app.py -
+2. **app.py** -
+   This Flask file basically manages image uploads, routes them to ML functions, cleans up temporary data, and renders results for compatibility and recommendations.
    
-3. rec.py -
+3. **rec.py** -
+   This file loads your trained compatibility model, manages product data, extracts ResNet50 embeddings, predicts fashion categories, calculates outfit compatibility, and returns top recommendations using cached features for faster performance.
    
 4. **preprocess.py** -
    This file basically have a function that is being used in train.py for extracting features of the images.

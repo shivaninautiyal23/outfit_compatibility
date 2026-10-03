@@ -16,9 +16,9 @@ tf.get_logger().setLevel('ERROR')
 # =====================================================================
 # CONFIG
 # =====================================================================
-MODEL_PATH   = r"C:/Users/Rajesh/OneDrive/Desktop/PYTHON/frs/model.h5"
-PRODUCTS_CSV = r"C:/Users/Rajesh/OneDrive/Desktop/PYTHON/frs/fashion_products_sample.csv"
-CACHE_FILE   = r"C:/Users/Rajesh/OneDrive/Desktop/PYTHON/frs/embeddings_cache.pkl"
+MODEL_PATH   = '/Users/shivaninautiyal/Desktop/Python/OutfitCompatibility/model.h5'
+PRODUCTS_CSV = '/Users/shivaninautiyal/Desktop/Python/OutfitCompatibility/fashion_products_sample.csv'
+CACHE_FILE   = '/Users/shivaninautiyal/Desktop/Python/OutfitCompatibility/embeddings_cache.pkl'
 
 print("🔄 Loading compatibility model...")
 

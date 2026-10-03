@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 from preprocess import extract_image_feature
@@ -12,10 +13,10 @@ tf.get_logger().setLevel('ERROR')
 # --- File Paths (Using relative paths for better portability) ---
 # NOTE: Assume these files are in the same directory as this script, 
 # and the images are in a subdirectory named 'images'.
-pairing_csv = 'C:/Users/Rajesh/OneDrive/Desktop/PYTHON/frs/Pairing.csv'
-products_csv = 'C:/Users/Rajesh/OneDrive/Desktop/PYTHON/frs/fashion_products_sample.csv'
-images_folder = 'C:/Users/Rajesh/OneDrive/Desktop/PYTHON/frs/images'
-model_path = 'C:/Users/Rajesh/OneDrive/Desktop/PYTHON/frs/model.h5'
+pairing_csv = '/Users/shivaninautiyal/Desktop/Python/OutfitCompatibility/Pairing.csv'
+products_csv = '/Users/shivaninautiyal/Desktop/Python/OutfitCompatibility/fashion_products_sample.csv'
+images_folder = '/Users/shivaninautiyal/Desktop/Python/OutfitCompatibility/static/images'
+model_path = '/Users/shivaninautiyal/Desktop/Python/OutfitCompatibility/model.h5'
 
 # Load datasets with encoding to avoid decode errors
 try:

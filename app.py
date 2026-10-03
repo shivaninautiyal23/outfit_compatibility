@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
-from rec3 import predict_compatibility_image_only, get_recommendations_for_item, ALL_CATEGORIES, ALL_GENDERS
+from rec import predict_compatibility_image_only, get_recommendations_for_item, ALL_CATEGORIES, ALL_GENDERS
 import os
 import shutil
 import tempfile
@@ -161,4 +161,151 @@ def get_recommendations():
 # RUN APP
 # --------------------------------------------------------------------------
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True)
+    app.run(debug=False,threaded = True)
+
+from flask import Flask, request, render_template
+from werkzeug.utils import secure_filename
+import os
+import shutil
+import tempfile
+import atexit
+
+# Import backend functions and ensure models load before server runs
+from rec import (
+    predict_compatibility_image_only,
+    get_recommendations_for_item,
+    ALL_CATEGORIES,
+    ALL_GENDERS,
+    base as IMAGE_BASE_DIR
+)
+
+app = Flask(__name__)
+
+# --------------------------------------------------
+# CONFIG
+# --------------------------------------------------
+UPLOAD_FOLDER = tempfile.mkdtemp()
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# --------------------------------------------------
+# CLEAN TEMPORARY UPLOADS
+# --------------------------------------------------
+def cleanup_temp_dir():
+    try:
+        shutil.rmtree(UPLOAD_FOLDER)
+    except:
+        pass
+
+atexit.register(cleanup_temp_dir)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# --------------------------------------------------
+# HOME
+# --------------------------------------------------
+@app.route('/')
+def home():
+    return render_template('index1.html',
+                           categories=ALL_CATEGORIES,
+                           genders=ALL_GENDERS)
+
+# --------------------------------------------------
+# COMPATIBILITY CHECK ROUTE
+# --------------------------------------------------
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    image1 = request.files.get('image1')
+    image2 = request.files.get('image2')
+
+    if not image1 or not image2:
+        return render_template('result1.html', error='Upload two images.'), 400
+
+    if not (allowed_file(image1.filename) and allowed_file(image2.filename)):
+        return render_template('result1.html', error='Invalid file type.'), 400
+
+    temp_path_1, temp_path_2 = None, None
+
+    try:
+        filename1 = secure_filename(image1.filename)
+        filename2 = secure_filename(image2.filename)
+
+        temp_path_1 = os.path.join(app.config['UPLOAD_FOLDER'], filename1)
+        temp_path_2 = os.path.join(app.config['UPLOAD_FOLDER'], filename2)
+
+        image1.save(temp_path_1)
+        image2.save(temp_path_2)
+
+        score = predict_compatibility_image_only(temp_path_1, temp_path_2)
+        score_percent = round(score * 100, 2)
+
+        return render_template('result1.html', score=score_percent, mode='Compatibility')
+
+    finally:
+        for path in [temp_path_1, temp_path_2]:
+            if path and os.path.exists(path):
+                os.remove(path)
+
+# --------------------------------------------------
+# RECOMMENDATION ROUTE
+# --------------------------------------------------
+@app.route('/get_recommendations', methods=['POST'])
+def get_recommendations():
+    if 'image_item' not in request.files:
+        return render_template('result1.html', error='Upload image.'), 400
+
+    image_item = request.files['image_item']
+    gender = request.form.get('gender_item')
+    category = request.form.get('category_item')
+
+    if not allowed_file(image_item.filename):
+        return render_template('result1.html', error='Invalid file type.'), 400
+
+    temp_path = None
+
+    try:
+        filename = secure_filename(image_item.filename)
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image_item.save(temp_path)
+
+        recommendations = get_recommendations_for_item(
+            temp_path, gender, category, top_n=5
+        )
+
+        STATIC_IMG_FOLDER = os.path.join(app.root_path, 'static', 'images')
+        os.makedirs(STATIC_IMG_FOLDER, exist_ok=True)
+
+        for rec in recommendations:
+            original_path = rec['image_path']
+
+            if not os.path.isabs(original_path):
+                original_path = os.path.join(IMAGE_BASE_DIR, original_path)
+
+            if os.path.exists(original_path):
+                dst_file = os.path.basename(original_path)
+                dst_path = os.path.join(STATIC_IMG_FOLDER, dst_file)
+
+                if not os.path.exists(dst_path):
+                    shutil.copy(original_path, dst_path)
+
+                rec['image_path'] = f'images/{dst_file}'
+            else:
+                rec['image_path'] = 'images/placeholder.png'
+
+        return render_template('result1.html',
+                               item_category=category,
+                               item_gender=gender,
+                               recommendations=recommendations,
+                               mode='Recommendation')
+
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            os.remove(temp_path)
+
+# --------------------------------------------------
+# RUN SERVER SAFELY FOR TENSORFLOW
+# --------------------------------------------------
+if __name__ == '__main__':
+    print("🚀 Flask server starting with TensorFlow initialized")
+    app.run(debug=True, threaded=False, processes=1)

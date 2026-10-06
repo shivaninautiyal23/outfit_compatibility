@@ -44,9 +44,15 @@ It can be scaled to handle millions of products, power virtual try-ons and even 
    i. saves the model(model.h5) 
 
 **FLOW:**
+
+
 Garment Images
+
+
 ↓
 ResNet50
+
+
 ↓
 2048-dimensional image embedding for each garment
 ↓
@@ -59,6 +65,8 @@ Dense Neural Network
 Sigmoid
 ↓
 Compatibility Score / Compatible (1) or Not Compatible (0)
+
+
 6. **pred/cat.py** -
    This file is a clothing classifier that uses MobileNetV2’s ImageNet labels to decide whether your input image is topwear, bottomwear, or unknown, by simply matching predicted labels with a manual list.
 

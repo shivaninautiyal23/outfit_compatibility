@@ -48,22 +48,32 @@ It can be scaled to handle millions of products, power virtual try-ons and even 
 
 Garment Images
 
-
 ↓
+
 ResNet50
 
+↓
+
+2048-dimensional image embedding for each garment
 
 ↓
-2048-dimensional image embedding for each garment
-↓
+
 Garment A embedding + Garment B embedding
+
 ↓
+
 4096-dimensional pair vector
+
 ↓
+
 Dense Neural Network
+
 ↓
+
 Sigmoid
+
 ↓
+
 Compatibility Score / Compatible (1) or Not Compatible (0)
 
 
